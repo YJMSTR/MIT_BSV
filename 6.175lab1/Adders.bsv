@@ -45,7 +45,11 @@ endmodule
 // CS = Carry Select
 module mkCSAdder( Adder8 );
     method ActionValue#( Bit#(9) ) sum( Bit#(8) a, Bit#(8) b, Bit#(1) c_in );
-        return 0;
+        Bit#(5) lowres = add4(a[3:0], b[3:0], c_in);
+        Bit#(5) highres_0 = add4(a[7:4], b[7:4], 0);
+        Bit#(5) highres_1 = add4(a[7:4], b[7:4], 1);
+
+        return {multiplexer_n(lowres[4], highres_0, highres_1), lowres[3:0]};
     endmethod
 endmodule
 
