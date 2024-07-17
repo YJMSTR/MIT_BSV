@@ -13,12 +13,25 @@ function Bit#(TAdd#(n,n)) multiply_signed( Bit#(n) a, Bit#(n) b );
     return pack( product_int );
 endfunction
 
-
+function Bit#(TAdd#(n, 1)) adder_comb ( Bit#(n) a, Bit#(n) b, Bit#(1) c_in);
+    UInt#(n) a_uint = unpack(a);
+    UInt#(n) b_uint = unpack(b);
+    UInt#(1) c_uint = unpack(c_in);
+    UInt#(TAdd#(n, 1)) sum_uint = zeroExtend(a_uint) + zeroExtend(b_uint) + zeroExtend(c_uint);
+    return pack( sum_uint);
+endfunction
 
 // Multiplication by repeated addition
 function Bit#(TAdd#(n,n)) multiply_by_adding( Bit#(n) a, Bit#(n) b );
-    // TODO: Implement this function in Exercise 2
-    return 0;
+    Bit#(n) tp = 0;
+    Bit#(n) prod = 0;
+    for (Integer i = 0; i < valueOf(n); i = i + 1) begin
+        let mi = (a[i] == 0) ? 0 : b;
+        Bit#(TAdd#(n, 1)) sum = adder_comb(tp, mi, 0);
+        prod[i] = sum[0];   // prod -> the low n bits of result
+        tp = sum[valueOf(n):1]; // tp -> the high n bits of result 
+    end
+    return {tp, prod};
 endfunction
 
 

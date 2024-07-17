@@ -29,6 +29,9 @@ endmodule
 (* synthesize *)
 module mkTbEx3();
     // TODO: Implement test bench for Exercise 3
+    function Bit#(16) test_unsigned ( Bit#(8) a, Bit#(8) b) = multiply_unsigned(a, b);
+    Empty tb <- mkTbMulFunction(test_unsigned, multiply_by_adding, True);
+    return tb;
 endmodule
 
 (* synthesize *)
