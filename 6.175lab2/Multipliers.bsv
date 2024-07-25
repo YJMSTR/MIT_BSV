@@ -44,10 +44,31 @@ interface Multiplier#( numeric type n );
     method ActionValue#(Bit#(TAdd#(n,n))) result();
 endinterface
 
+function Bit#(1) fa_sum( Bit#(1) a, Bit#(1) b, Bit#(1) c_in );
+    return (a^b)^c_in;
+endfunction
 
+function Bit#(1) fa_carry( Bit#(1) a, Bit#(1) b, Bit#(1) c_in );
+    return (a&b)|((a^b)&c_in);
+endfunction
 
+function Bit#(2) fa(Bit#(1) a, Bit#(1) b, Bit#(1) c_in);
+    return {fa_carry(a,b,c_in), fa_sum(a, b, c_in)};
+endfunction
+
+function Bit#(TAdd#(n, 1)) addN(Bit#(n) a, Bit#(n) b, Bit#(1) c_in);
+    Bit#(TAdd#(n, 1)) res = 0;
+    Bit#(TAdd#(n, 1)) c = 0;
+    c[0] = c_in;
+    for (Integer i = 0; i < valueOf(n); i = i + 1) begin
+        res[i] = fa_sum(a[i], b[i], c[i]);
+        c[i+1] = fa_carry(a[i], b[i], c[i]);
+    end
+    res[valueOf(n)] = c[valueOf(n)];
+    return res;
+endfunction
 // Folded multiplier by repeated addition
-module mkFoldedMultiplier( Multiplier#(n) );
+module mkFoldedMultiplier( Multiplier#(n) ) provisos(Add#(1, a__, n));
     // You can use these registers or create your own if you want
     Reg#(Bit#(n)) a <- mkRegU();
     Reg#(Bit#(n)) b <- mkRegU();
@@ -55,27 +76,46 @@ module mkFoldedMultiplier( Multiplier#(n) );
     Reg#(Bit#(n)) tp <- mkRegU();
     Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n)+1) );
 
-    // rule mulStep( /* guard goes here */ );
-    //     // TODO: Implement this in Exercise 4
-    // endrule
+    /*
+    Can you implement it without using a variable-shift 
+    bit shifter? Without using dynamic bit selection? 
+    (In other words, can you avoid shifting or bit selection by a value stored in a register?)
+    */
+
+    rule mulStep( i < fromInteger(valueOf(n)) );
+        Bit#(n) m = (a[0] == 0) ? 0 : b;
+        a <= a >> 1;
+        let sum = addN(m, tp, 0);
+        prod <= {sum[0], prod[valueOf(n)-1:1]};
+        tp <= sum[valueOf(n):1];
+        i <= i+1;
+    endrule
 
     method Bool start_ready();
-        // TODO: Implement this in Exercise 4
-        return False;
+        return i == fromInteger(valueOf(n)+1);
     endmethod
 
     method Action start( Bit#(n) aIn, Bit#(n) bIn );
-        // TODO: Implement this in Exercise 4
+        if (i == fromInteger(valueOf(n)+1)) begin
+            a <= aIn;
+            b <= bIn;
+            i <= 0;
+            tp <= 0;
+            prod <= 0;
+        end
     endmethod
 
     method Bool result_ready();
-        // TODO: Implement this in Exercise 4
-        return False;
+        return i == fromInteger(valueOf(n));
     endmethod
 
     method ActionValue#(Bit#(TAdd#(n,n))) result();
-        // TODO: Implement this in Exercise 4
-        return 0;
+        if (i == fromInteger(valueOf(n))) begin
+            i <= i + 1;
+            return {tp, prod};
+        end else begin
+            return 0;
+        end
     endmethod
 endmodule
 

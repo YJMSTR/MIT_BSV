@@ -36,7 +36,9 @@ endmodule
 
 (* synthesize *)
 module mkTbEx5();
-    // TODO: Implement test bench for Exercise 5
+    Multiplier#(8) test_folded <- mkFoldedMultiplier();
+    Empty tb <- mkTbMulModule(test_folded, multiply_by_adding, True);
+    return tb;
 endmodule
 
 (* synthesize *)
