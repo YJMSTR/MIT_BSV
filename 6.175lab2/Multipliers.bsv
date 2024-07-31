@@ -122,33 +122,61 @@ endmodule
 
 
 // Booth Multiplier
+
+// The repeated addition algorithm works well multiplying unsigned inputs, 
+// but it is not able to multiply (negative) numbers in two's complement encoding. 
+// To multiply signed numbers, you need a different multiplication algorithm.
+
+// Booth's Multiplication Algorithm is an algorithm that works with signed two's complement numbers
+
+// Booth's encoding: A '+' in the i-th bit represents (+1) · 2i, but a '-' in the i-th bit correspond to (-1) · 2i.
+function Bit#(n) sra(Bit#(n) a, Integer n);
+    Int#(n) signed_a = unpack(a);
+    return pack(signed_a >> n);
+endfunction
+
 module mkBoothMultiplier( Multiplier#(n) );
     Reg#(Bit#(TAdd#(TAdd#(n,n),1))) m_neg <- mkRegU;
     Reg#(Bit#(TAdd#(TAdd#(n,n),1))) m_pos <- mkRegU;
     Reg#(Bit#(TAdd#(TAdd#(n,n),1))) p <- mkRegU;
     Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n)+1) );
 
-    // rule mul_step( /* guard goes here */ );
-    //     // TODO: Implement this in Exercise 6
-    // endrule
+    rule mul_step( i < fromInteger(valueOf(n)) );
+        let pr = p[1:0];
+        Bit#(TAdd#(TAdd#(n, n), 1)) cur_p = p;
+        if (pr == 2'b01) begin
+            cur_p = cur_p + m_pos;
+        end else if (pr == 2'b10) begin
+            cur_p = cur_p + m_neg;
+        end 
+        p <= sra(cur_p, 1);
+        i <= i + 1;
+    endrule
 
     method Bool start_ready();
-        // TODO: Implement this in Exercise 6
-        return False;
+        return i == fromInteger(valueOf(n) + 1);
     endmethod
 
     method Action start( Bit#(n) m, Bit#(n) r );
-        // TODO: Implement this in Exercise 6
+        if (i == fromInteger(valueOf(n) + 1)) begin
+            p <= {0, r, 1'b0};   // add a '0' bit at pos -1
+            m_pos <= {m, 0};
+            m_neg <= {(-m), 0};
+            i <= 0;
+        end
     endmethod
 
     method Bool result_ready();
-        // TODO: Implement this in Exercise 6
-        return False;
+        return i == fromInteger(valueOf(n));
     endmethod
 
     method ActionValue#(Bit#(TAdd#(n,n))) result();
-        // TODO: Implement this in Exercise 6
-        return 0;
+        if (i == fromInteger(valueOf(n)) ) begin
+            i <= i + 1;
+            return p[valueOf(n)*2:1];
+        end else begin 
+            return 0;
+        end
     endmethod
 endmodule
 
