@@ -189,27 +189,55 @@ module mkBoothMultiplierRadix4( Multiplier#(n) );
     Reg#(Bit#(TAdd#(TAdd#(n,n),2))) p <- mkRegU;
     Reg#(Bit#(TAdd#(TLog#(n),1))) i <- mkReg( fromInteger(valueOf(n)/2+1) );
 
-    // rule mul_step( /* guard goes here */ );
-    //     // TODO: Implement this in Exercise 8
-    // endrule
+    rule mul_step( i < fromInteger(valueOf(n)/2) );
+        Bit#(TAdd#(TAdd#(n, n), 2)) cur_p = p;
+        let pr = cur_p[2:0];
+        if (pr == 3'b000) begin
+            
+        end else if (pr == 3'b001) begin
+            cur_p = cur_p + m_pos;
+        end else if (pr == 3'b010) begin
+            cur_p = cur_p + m_pos;
+        end else if (pr == 3'b011) begin
+            cur_p = cur_p + (m_pos << 1);
+        end else if (pr == 3'b100) begin
+            cur_p = cur_p + (m_neg << 1);
+        end else if (pr == 3'b101) begin
+            cur_p = cur_p + m_neg;
+        end else if (pr == 3'b110) begin
+            cur_p = cur_p + m_neg;
+        end else if (pr == 3'b111) begin
+            
+        end
+
+        p <= sra(cur_p, 2);
+        i <= i + 1;
+    endrule
 
     method Bool start_ready();
-        // TODO: Implement this in Exercise 8
-        return False;
+        return (i == fromInteger(valueOf(n)/2 + 1)); 
     endmethod
 
     method Action start( Bit#(n) m, Bit#(n) r );
-        // TODO: Implement this in Exercise 8
+        if (i == fromInteger(valueOf(n)/2 + 1)) begin 
+            i <= 0;
+            m_neg <= {msb(-m), -m, 0};
+            m_pos <= {msb(m), m, 0};
+            p <= {0, r, 1'b0};
+        end
     endmethod
 
     method Bool result_ready();
-        // TODO: Implement this in Exercise 8
-        return False;
+        return i == fromInteger(valueOf(n)/2);
     endmethod
 
     method ActionValue#(Bit#(TAdd#(n,n))) result();
-        // TODO: Implement this in Exercise 8
-        return 0;
+        if (i == fromInteger(valueOf(n)/2)) begin
+            i <= i + 1;
+            return p[valueOf(n)*2:1];
+        end else begin
+            return 0;
+        end
     endmethod
 endmodule
 

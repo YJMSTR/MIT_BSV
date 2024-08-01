@@ -57,11 +57,15 @@ endmodule
 
 (* synthesize *)
 module mkTbEx9a();
-    // TODO: Implement test bench for Exercise 9
+    Multiplier#(4) test_folded <- mkBoothMultiplierRadix4();
+    Empty tb <- mkTbMulModule(test_folded, multiply_signed, True);
+    return tb;
 endmodule
 
 (* synthesize *)
 module mkTbEx9b();
-    // TODO: Implement test bench for Exercise 9
+    Multiplier#(8) test_folded <- mkBoothMultiplierRadix4();
+    Empty tb <- mkTbMulModule(test_folded, multiply_signed, True);
+    return tb;
 endmodule
 
