@@ -143,25 +143,51 @@ endmodule
 module mkMyBypassFifo( Fifo#(n, t) ) provisos (Bits#(t,tSz));
     // n is size of fifo
     // t is data type of fifo
-    Vector#(n, Reg#(t))     data     <- replicateM(mkRegU());
-    Reg#(Bit#(TLog#(n)))    enqP     <- mkReg(0);
-    Reg#(Bit#(TLog#(n)))    deqP     <- mkReg(0);
-    Reg#(Bool)              empty    <- mkReg(True);
-    Reg#(Bool)              full     <- mkReg(False);
+    Vector#(n, Reg#(t))         data     <- replicateM(mkRegU());
+    Ehr#(3, Bit#(TLog#(n)))     enqP     <- mkEhr(0);
+    Ehr#(3, Bit#(TLog#(n)))     deqP     <- mkEhr(0);
+    Ehr#(3, Bool)               empty    <- mkEhr(True);
+    Ehr#(3, Bool)               full     <- mkEhr(False);
+    
+    // useful value
+    Bit#(TLog#(n))              max_index = fromInteger(valueOf(n)-1);
+
     method Bool notFull;
-        return full == False;
+        return !full[0];
     endmethod
-    method Action enq(t x);
+
+    method Action enq(t x) if(!full[0]);
+        data[enqP[0]] <= x;   // Ehr[1] 是 Ehr[0] 本周期要写入的值，bypass
+        empty[0] <= False;
+        let enqP_next = enqP[0] == max_index ? 0 : enqP[0] + 1;
+        if (enqP_next == deqP[0]) begin
+            full[0] <= True;
+        end
+        enqP[0] <= enqP_next; 
     endmethod
+
     method Bool notEmpty;
-        return empty == False;
+        return !empty[1];
     endmethod
-    method Action deq;
+
+    method Action deq if (!empty[1]);
+        full[1] <= False;
+        let deqP_next = deqP[1] == max_index ? 0 : deqP[1] + 1;
+        if (deqP_next == enqP[1]) begin
+            empty[1] <= True;
+        end
+        deqP[1] <= deqP_next;
     endmethod
-    method t first;
-        return data[deqP];
+
+    method t first if(!empty[1]);
+        return data[deqP[1]];
     endmethod
+
     method Action clear;
+        deqP[2]     <= 0;
+        enqP[2]     <= 0;
+        full[2]     <= False;
+        empty[2]    <= True;
     endmethod
 endmodule
 
