@@ -231,24 +231,41 @@ module mkMyCFFifo( Fifo#(n, t) ) provisos (Bits#(t,tSz));
     // This canonicalize rule should fire at the end of each cycle 
     // after all of the other methods.
     (* fire_when_enabled *)
-    rule canocalize ();
-        if (isValid(enq_ehr[1]) && !full) begin
-            let enqP_next = enqP == max_index ? 0 : enqP + 1;
-            if (enqP_next == deqP) begin
-                full <= True;
-            end
-            enqP <= enqP_next;
-            data[enqP] <= fromMaybe(?, enq_ehr[1]);
-            empty <= False;
-        end
-        if (isValid(deq_ehr[1]) && !empty) begin
-            let deqP_next = deqP == max_index ? 0 : deqP + 1;
-            if (deqP_next == enqP) begin
-                empty <= True;
-            end
+    rule canocalize ;
+        if (isValid(clear_ehr[1])) begin
+            enqP <= 0;
+            deqP <= 0;
+            empty <= True;
             full <= False;
-            deqP <= deqP_next;
+        end else begin
+            let enqP_next = enqP == max_index ? 0 : enqP + 1;
+            let deqP_next = deqP == max_index ? 0 : deqP + 1;
+            if (isValid(enq_ehr[1]) && !full) begin
+                enqP <= enqP_next;
+                data[enqP] <= fromMaybe(?, enq_ehr[1]);
+            end
+            if (isValid(deq_ehr[1]) && !empty) begin
+                deqP <= deqP_next;
+            end
+            if (isValid(enq_ehr[1]) && !full) begin
+                if (isValid(deq_ehr[1]) && !empty) begin
+                    full <= False;
+                end else if (enqP_next == deqP) begin
+                    full <= True;
+                end
+                empty <= False;
+            end else if (isValid(deq_ehr[1]) && !empty) begin
+                if (enqP == deqP_next) begin
+                    empty <= True;
+                end
+                full <= False;
+            end
         end
+        // 用完要清零
+        enq_ehr[1] <= tagged Invalid;
+        deq_ehr[1] <= tagged Invalid;
+        clear_ehr[1] <= tagged Invalid;
+
     endrule
 
     method Bool notFull;
