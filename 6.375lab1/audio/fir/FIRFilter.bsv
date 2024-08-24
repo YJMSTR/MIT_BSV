@@ -25,22 +25,31 @@ module mkFIRFilter (AudioProcessor);
     rule process (True);
         Sample sample = infifo.first();
         infifo.deq();
-
-        for (Integer i = 0; i < 7; i = i+1) begin
+        for (Integer i = 0; i < 7; i = i + 1) begin
             r[i+1] <= r[i];
         end
+        multiplier[0].putOperands(c[0], sample);
+        // FixedPoint#(16, 16) accumulate = 
+        //       c[0] * fromInt(sample)
+        //     + c[1] * fromInt(r0)
+        //     + c[2] * fromInt(r1)
+        //     + c[3] * fromInt(r2)
+        //     + c[4] * fromInt(r3)
+        //     + c[5] * fromInt(r4)
+        //     + c[6] * fromInt(r5)
+        //     + c[7] * fromInt(r6)
+        //     + c[8] * fromInt(r7);
+        for (Integer i = 1; i < 9; i = i + 1) begin
+            multiplier[i].putOperands(c[i], r[i-1]);    
+        end
+    endrule
 
-        FixedPoint#(16, 16) accumulate = 
-              c[0] * fromInt(sample)
-            + c[1] * fromInt(r0)
-            + c[2] * fromInt(r1)
-            + c[3] * fromInt(r2)
-            + c[4] * fromInt(r3)
-            + c[5] * fromInt(r4)
-            + c[6] * fromInt(r5)
-            + c[7] * fromInt(r6)
-            + c[8] * fromInt(r7);
-
+    rule get_multiplier_res;
+        FixedPoint#(16, 16) accumulate <- multiplier[0].getResult();
+        for (Integer i = 1; i < 9; i = i + 1) begin
+            let x <- multiplier[i].getResult();
+            accumulate = accumulate + x;
+        end
         outfifo.enq(fxptGetInt(accumulate));
     endrule
 
