@@ -200,7 +200,7 @@ module mkCircularFFT (FFT);
         if (stagei == 0) begin inputFIFO.deq; sxIn = inputFIFO.first; end
         else sxIn = sReg;
         let sxOut = stage_f(zeroExtend(stagei), sxIn);
-        if (stagei == fromInteger(valueOf(FFT_LOG_POINTS))) begin outputFIFO.enq(sxOut); stagei <= 0; end
+        if (stagei == fromInteger(valueOf(FFT_LOG_POINTS)-1)) begin outputFIFO.enq(sxOut); stagei <= 0; end
         else begin sReg <= sxOut; stagei <= stagei + 1; end
 
     endrule
@@ -216,8 +216,8 @@ endmodule
 // Wrapper around The FFT module we actually want to use
 module mkFFT (FFT);
     // FFT fft <- mkCombinationalFFT();
-    FFT fft <- mkLinearFFT();
-    // FFT fft <- mkCircularFFT();
+    // FFT fft <- mkLinearFFT();
+    FFT fft <- mkCircularFFT();
     
     interface Put request = fft.request;
     interface Get response = fft.response;
