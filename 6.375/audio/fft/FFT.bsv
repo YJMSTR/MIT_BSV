@@ -157,7 +157,7 @@ module mkLinearFFT (FFT);   // InelasticPipeline
         // outputFIFO.enq(stage_data[valueof(FFT_LOG_POINTS)]);
         if (outputFIFO.notFull() || regValid[valueof(FFT_LOG_POINTS)] != Valid) begin
             if (inputFIFO.notEmpty) begin
-                (regs[0]) <= stage_f(0, inputFIFO.first);
+                (regs[0]) <= inputFIFO.first();
                 inputFIFO.deq();
                 (regValid[0]) <= Valid;
             end 
@@ -217,6 +217,7 @@ endmodule
 module mkFFT (FFT);
     // FFT fft <- mkCombinationalFFT();
     FFT fft <- mkLinearFFT();
+    // FFT fft <- mkCircularFFT();
     
     interface Put request = fft.request;
     interface Get response = fft.response;
