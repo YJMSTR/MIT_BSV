@@ -129,10 +129,59 @@ module mkCombinationalFFT (FFT);
   interface Get response = toGet(outputFIFO);
 
 endmodule
+typedef union tagged { void Valid; void Invalid; } ValidBit deriving (Eq, Bits);
+module mkLinearFFT (FFT);   // InelasticPipeline
+    TwiddleTable twiddles = genTwiddles();
+
+    function Vector#(FFT_POINTS, ComplexSample) stage_f(Bit#(TLog#(FFT_LOG_POINTS)) stage, Vector#(FFT_POINTS, ComplexSample) stage_in);
+        return stage_ft(twiddles, stage, stage_in);
+    endfunction
+
+    FIFO#(Vector#(FFT_POINTS, ComplexSample)) inputFIFO <- mkFIFO();
+    FIFO#(Vector#(FFT_POINTS, ComplexSample)) outputFIFO <- mkFIFO();
+    Vector#(TAdd#(1, FFT_LOG_POINTS), Reg#(Vector#(FFT_POINTS, ComplexSample))) regs <- replicateM(mkRegU);
+    Vector#(TAdd#(1, FFT_LOG_POINTS), Reg#(ValidBit)) regValid <- replicateM(Invalid);
+    
+
+    rule linear_fft;
+        // rule comb_fft;
+        // Vector#(TAdd#(1, FFT_LOG_POINTS), Vector#(FFT_POINTS, ComplexSample)) stage_data = newVector();
+        // stage_data[0] = inputFIFO.first();
+        // inputFIFO.deq();
+
+        // for (Integer stage = 0; stage < valueof(FFT_LOG_POINTS); stage=stage+1) begin
+        //     stage_data[stage+1] = stage_f(fromInteger(stage), stage_data[stage]);
+        // end
+
+        // outputFIFO.enq(stage_data[valueof(FFT_LOG_POINTS)]);
+        if (outputFIFO.notFull || regValid[valueof(FFT_LOG_POINTS)] != Valid) begin
+            if (inputFIFO.notEmpty) begin
+                (regs[0]) <= stage_f(0, inputFIFO.first);
+                inputFIFO.deq();
+                (regValid[0]) <= Valid;
+            end 
+            else (regValid[0]) <= Invalid;
+        end
+        for (Integer stage = 1; stage <= valueof(FFT_LOG_POINTS); stage = stage + 1) begin
+            (regs[stage]) <= stage_f(fromInteger(stage-1), regs[stage-1]); 
+            (regValid[stage]) <= regValid[stage-1];
+        end
+        if (regValid[valueof(FFT_LOG_POINTS)] == Valid) outputFIFO.enq(regs[valueof(FFT_LOG_POINTS)]);
+    endrule
+
+    interface Put request;
+        method Action put(Vector#(FFT_POINTS, ComplexSample) x);
+            inputFIFO.enq(bitReverse(x));
+        endmethod
+    endinterface
+
+    interface Get response = toGet(outputFIFO);
+endmodule
 
 // Wrapper around The FFT module we actually want to use
 module mkFFT (FFT);
-    FFT fft <- mkCombinationalFFT();
+    // FFT fft <- mkCombinationalFFT();
+    FFT fft <- mkLinearFFT();
     
     interface Put request = fft.request;
     interface Get response = fft.response;
