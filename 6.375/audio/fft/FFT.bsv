@@ -2,6 +2,7 @@
 import ClientServer::*;
 import Complex::*;
 import FIFO::*;
+import FIFOF::*;
 import Reg6375::*;
 import GetPut::*;
 import Real::*;
@@ -137,10 +138,10 @@ module mkLinearFFT (FFT);   // InelasticPipeline
         return stage_ft(twiddles, stage, stage_in);
     endfunction
 
-    FIFO#(Vector#(FFT_POINTS, ComplexSample)) inputFIFO <- mkFIFO();
-    FIFO#(Vector#(FFT_POINTS, ComplexSample)) outputFIFO <- mkFIFO();
+    FIFOF#(Vector#(FFT_POINTS, ComplexSample)) inputFIFO <- mkFIFOF();
+    FIFOF#(Vector#(FFT_POINTS, ComplexSample)) outputFIFO <- mkFIFOF();
     Vector#(TAdd#(1, FFT_LOG_POINTS), Reg#(Vector#(FFT_POINTS, ComplexSample))) regs <- replicateM(mkRegU);
-    Vector#(TAdd#(1, FFT_LOG_POINTS), Reg#(ValidBit)) regValid <- replicateM(Invalid);
+    Vector#(TAdd#(1, FFT_LOG_POINTS), Reg#(ValidBit)) regValid <- replicateM(mkReg(Invalid));
     
 
     rule linear_fft;
@@ -154,7 +155,7 @@ module mkLinearFFT (FFT);   // InelasticPipeline
         // end
 
         // outputFIFO.enq(stage_data[valueof(FFT_LOG_POINTS)]);
-        if (outputFIFO.notFull || regValid[valueof(FFT_LOG_POINTS)] != Valid) begin
+        if (outputFIFO.notFull() || regValid[valueof(FFT_LOG_POINTS)] != Valid) begin
             if (inputFIFO.notEmpty) begin
                 (regs[0]) <= stage_f(0, inputFIFO.first);
                 inputFIFO.deq();
@@ -178,6 +179,40 @@ module mkLinearFFT (FFT);   // InelasticPipeline
     interface Get response = toGet(outputFIFO);
 endmodule
 
+module mkCircularFFT (FFT);   
+    TwiddleTable twiddles = genTwiddles();
+
+    function Vector#(FFT_POINTS, ComplexSample) stage_f(Bit#(TLog#(FFT_LOG_POINTS)) stage, Vector#(FFT_POINTS, ComplexSample) stage_in);
+        return stage_ft(twiddles, stage, stage_in);
+    endfunction
+
+    FIFO#(Vector#(FFT_POINTS, ComplexSample)) inputFIFO <- mkFIFO();
+    FIFO#(Vector#(FFT_POINTS, ComplexSample)) outputFIFO <- mkFIFO();
+    Reg#(Vector#(FFT_POINTS, ComplexSample)) regs <- mkRegU();
+    Reg#(ValidBit) regValid <- mkReg(Invalid);
+    Reg#(Bit#(TLog#(FFT_LOG_POINTS))) stagei <- mkRegU();
+    Reg#(Vector#(FFT_POINTS, ComplexSample)) sReg <- mkRegU();
+    
+
+    
+    rule circular_fft;
+        let sxIn = ?;
+        if (stagei == 0) begin inputFIFO.deq; sxIn = inputFIFO.first; end
+        else sxIn = sReg;
+        let sxOut = stage_f(zeroExtend(stagei), sxIn);
+        if (stagei == fromInteger(valueOf(FFT_LOG_POINTS))) begin outputFIFO.enq(sxOut); stagei <= 0; end
+        else begin sReg <= sxOut; stagei <= stagei + 1; end
+
+    endrule
+
+    interface Put request;
+        method Action put(Vector#(FFT_POINTS, ComplexSample) x);
+            inputFIFO.enq(bitReverse(x));
+        endmethod
+    endinterface
+
+    interface Get response = toGet(outputFIFO);
+endmodule
 // Wrapper around The FFT module we actually want to use
 module mkFFT (FFT);
     // FFT fft <- mkCombinationalFFT();
