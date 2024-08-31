@@ -6,7 +6,7 @@ import AudioProcessorTypes::*;
 // import FilterCoefficients::*;
 import Multiplier::*;
 
-module mkFIRFilter (Vector#(9, FixedPoint#(16,16)) coeffs, AudioProcessor ifc);
+module mkFIRFilter (Vector#(tnp1, FixedPoint#(16,16)) coeffs, AudioProcessor ifc);
     FIFO#(Sample) infifo <- mkFIFO();
     FIFO#(Sample) outfifo <- mkFIFO();
     
@@ -18,14 +18,15 @@ module mkFIRFilter (Vector#(9, FixedPoint#(16,16)) coeffs, AudioProcessor ifc);
     // Reg#(Sample) r5 <- mkReg(0);
     // Reg#(Sample) r6 <- mkReg(0);
     // Reg#(Sample) r7 <- mkReg(0);
-    Vector#(8, Reg#(Sample)) r <- replicateM(mkReg(0));
+    Integer numtaps = valueOf(TSub#(tnp1, 1));
+    Vector#(TSub#(tnp1, 1), Reg#(Sample)) r <- replicateM(mkReg(0));
 
-    Vector#(9, Multiplier) multiplier <- replicateM(mkMultiplier);
+    Vector#(tnp1, Multiplier) multiplier <- replicateM(mkMultiplier);
     
     rule process (True);
         Sample sample = infifo.first();
         infifo.deq();
-        for (Integer i = 0; i < 7; i = i + 1) begin
+        for (Integer i = 0; i < numtaps - 1; i = i + 1) begin
             r[i+1] <= r[i];
         end
         multiplier[0].putOperands(coeffs[0], sample);
@@ -39,14 +40,14 @@ module mkFIRFilter (Vector#(9, FixedPoint#(16,16)) coeffs, AudioProcessor ifc);
         //     + c[6] * fromInt(r5)
         //     + c[7] * fromInt(r6)
         //     + c[8] * fromInt(r7);
-        for (Integer i = 1; i < 9; i = i + 1) begin
+        for (Integer i = 1; i < valueOf(tnp1); i = i + 1) begin
             multiplier[i].putOperands(coeffs[i], r[i-1]);    
         end
     endrule
 
     rule get_multiplier_res;
         FixedPoint#(16, 16) accumulate <- multiplier[0].getResult();
-        for (Integer i = 1; i < 9; i = i + 1) begin
+        for (Integer i = 1; i < valueOf(tnp1); i = i + 1) begin
             let x <- multiplier[i].getResult();
             accumulate = accumulate + x;
         end
