@@ -3,10 +3,10 @@ import FixedPoint::*;
 import Vector::*;
 
 import AudioProcessorTypes::*;
-import FilterCoefficients::*;
+// import FilterCoefficients::*;
 import Multiplier::*;
 
-module mkFIRFilter (AudioProcessor);
+module mkFIRFilter (Vector#(9, FixedPoint#(16,16)) coeffs, AudioProcessor ifc);
     FIFO#(Sample) infifo <- mkFIFO();
     FIFO#(Sample) outfifo <- mkFIFO();
     
@@ -28,7 +28,7 @@ module mkFIRFilter (AudioProcessor);
         for (Integer i = 0; i < 7; i = i + 1) begin
             r[i+1] <= r[i];
         end
-        multiplier[0].putOperands(c[0], sample);
+        multiplier[0].putOperands(coeffs[0], sample);
         // FixedPoint#(16, 16) accumulate = 
         //       c[0] * fromInt(sample)
         //     + c[1] * fromInt(r0)
@@ -40,7 +40,7 @@ module mkFIRFilter (AudioProcessor);
         //     + c[7] * fromInt(r6)
         //     + c[8] * fromInt(r7);
         for (Integer i = 1; i < 9; i = i + 1) begin
-            multiplier[i].putOperands(c[i], r[i-1]);    
+            multiplier[i].putOperands(coeffs[i], r[i-1]);    
         end
     endrule
 
