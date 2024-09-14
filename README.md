@@ -32,3 +32,15 @@ Error: dlopen: ./out.so: undefined symbol: _Z12dollar_fopenPKcPKSsS2_
 上网搜到[如下帖子](https://github.com/B-Lang-org/bsc/issues/704)后按照帖子里的方法添加 `-ffat-lto-objects` 参数重新编译 bsc，还是会报这个错误。
 
 解决方法：在 BluespecSV-CN 交流群里问群友得知，可以将 bscflags 的 `-Xc++ -D_GLIBCXX_USE_CXX11_ABI=0` 删掉，或者将 0 改为 1 即可。
+
+### lab3
+
+#### p2 ref.c
+
+没看懂 p2 要干嘛，意思是要根据 ref.c 造一组新测例喂给 bsv？暂时跳过
+
+#### ToMP & FromMP
+
+实现流水线中的 ToMP 和 FromMP 模块，用 Cordic 算法转换直角坐标和极坐标。Cordic 的代码已经给我们了，直接调用就行。
+
+写完以后往流水线里加三个模块。

@@ -1,4 +1,3 @@
-
 import Complex::*;
 import FixedPoint::*;
 import Real::*;
@@ -55,7 +54,14 @@ function Real gain(Integer iters);
 endfunction
 
 // Convert complex numbers in REAL/IMAGINARY format to MAGNITUDE/PHASE.
-module mkCordicToMagnitudePhase (ToMagnitudePhase#(isize, fsize, psize));
+module mkCordicToMagnitudePhase (ToMagnitudePhase#(isize, fsize, psize))
+    provisos(
+        RealLiteral#(FixedPoint#(isize, fsize)),
+        Arith#(FixedPoint#(isize, fsize)),
+        Bitwise#(FixedPoint#(isize, fsize)),
+        Ord#(FixedPoint#(isize, fsize)),
+        Add#(a__, 1, isize)
+    );
     Reg#(Bool) idle <- mkReg(True);
     Reg#(FixedPoint#(isize, fsize)) rel <- mkRegU();
     Reg#(FixedPoint#(isize, fsize)) img <- mkRegU();
@@ -127,7 +133,13 @@ module mkCordicToMagnitudePhase (ToMagnitudePhase#(isize, fsize, psize));
 
 endmodule
 
-module mkCordicFromMagnitudePhase (FromMagnitudePhase#(isize, fsize, psize));
+module mkCordicFromMagnitudePhase (FromMagnitudePhase#(isize, fsize, psize))
+    provisos(
+        RealLiteral#(FixedPoint#(isize, fsize)),
+        Arith#(FixedPoint#(isize, fsize)),
+        Bitwise#(FixedPoint#(isize, fsize)),
+        Add#(a__, 1, isize)
+    );
     Reg#(Bool) idle <- mkReg(True);
     Reg#(FixedPoint#(isize, fsize)) rel <- mkRegU();
     Reg#(FixedPoint#(isize, fsize)) img <- mkRegU();
