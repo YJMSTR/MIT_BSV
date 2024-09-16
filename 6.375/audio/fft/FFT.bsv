@@ -95,7 +95,6 @@ function Vector#(fft_points, Complex#(cmplxd)) stage_ft(TwiddleTable#(fft_points
     return stage_out;
 endfunction
 
-(* synthesize *)
 module mkCombinationalFFT (FFT#(fft_points, cmplxd)) provisos(Add#(2, a__, fft_points), Bits#(Vector#(fft_points, Complex#(cmplxd)), b__), Arith#(cmplxd), RealLiteral#(cmplxd));
 
   // Statically generate the twiddle factors table.
@@ -134,7 +133,7 @@ module mkCombinationalFFT (FFT#(fft_points, cmplxd)) provisos(Add#(2, a__, fft_p
 endmodule
 typedef union tagged { void Valid; void Invalid; } ValidBit deriving (Eq, Bits);
 
-(* synthesize *)
+
 module mkLinearFFT (FFT#(fft_points, cmplxd)) provisos(Add#(2, a__, fft_points), Bits#(Vector#(fft_points, Complex#(cmplxd)), b__), RealLiteral#(cmplxd), Arith#(cmplxd));   // InelasticPipeline
     TwiddleTable#(fft_points, cmplxd) twiddles = genTwiddles();
 
@@ -183,7 +182,7 @@ module mkLinearFFT (FFT#(fft_points, cmplxd)) provisos(Add#(2, a__, fft_points),
     interface Get response = toGet(outputFIFO);
 endmodule
 
-(* synthesize *)
+
 module mkCircularFFT (FFT#(fft_points, cmplxd)) provisos(Add#(2, a__, fft_points), Bits#(Vector#(fft_points, Complex#(cmplxd)), b__), Arith#(cmplxd), RealLiteral#(cmplxd));   
     TwiddleTable#(fft_points, cmplxd) twiddles = genTwiddles();
 
@@ -228,7 +227,7 @@ endmodule
 
 // Inverse FFT, based on the mkFFT module.
 // ifft[k] = fft[N-k]/N
-(* synthesize *)
+
 module mkIFFT (FFT#(fft_points, cmplxd)) provisos(Add#(2, a__, fft_points), Bits#(Vector#(fft_points, Complex#(cmplxd)), b__), Bitwise#(cmplxd), Arith#(cmplxd), RealLiteral#(cmplxd));
 
     FFT#(fft_points, cmplxd) fft <- mkFFT();

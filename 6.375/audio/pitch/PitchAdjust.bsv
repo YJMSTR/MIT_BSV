@@ -15,12 +15,15 @@ typedef Server#(
 ) PitchAdjust#(numeric type nbins, numeric type isize, numeric type fsize, numeric type psize);
 
 
+interface SettablePitchAdjust#(numeric type nbins, numeric type isize, numeric type fsize, numeric type psize);
+    interface PitchAdjust#(nbins, isize, fsize, psize) adjust;
+    interface Put#(FixedPoint#(isize, fsize)) setFactor;
+endinterface
 // s - the amount each window is shifted from the previous window.
 //
 // factor - the amount to adjust the pitch.
 //  1.0 makes no change. 2.0 goes up an octave, 0.5 goes down an octave, etc...
-(* synthesize *)
-module mkPitchAdjust(Integer s, FixedPoint#(isize, fsize) factor, PitchAdjust#(nbins, isize, fsize, psize) ifc) provisos(RealLiteral#(FixedPoint#(isize, fsize)), Add#(psize, a__, isize), Min#(TAdd#(isize, fsize), 2, 2), Add#(b__, psize, TAdd#(isize, isize)));
+module mkPitchAdjust(Integer s, SettablePitchAdjust#(nbins, isize, fsize, psize) ifc) provisos(RealLiteral#(FixedPoint#(isize, fsize)), Add#(psize, a__, isize), Min#(TAdd#(isize, fsize), 2, 2), Add#(b__, psize, TAdd#(isize, isize)));
     FIFO#(Vector#(nbins, ComplexMP#(isize, fsize, psize))) inputFIFO <- mkFIFO();
     FIFO#(Vector#(nbins, ComplexMP#(isize, fsize, psize))) outputFIFO <- mkFIFO();
 
@@ -34,6 +37,8 @@ module mkPitchAdjust(Integer s, FixedPoint#(isize, fsize) factor, PitchAdjust#(n
     Reg#(FixedPoint#(isize, fsize)) bin <- mkReg(0);
     // 根据 Testbench 代码，可能存在同一个周期 feed 和 check 的情况，需要在同一个周期内完成 Put 和 Get
     Reg#(Bool) init_flag <- mkReg(True);
+
+    Reg#(FixedPoint#(isize, fsize)) factor <- mkReg(unpack(2));
 
     rule inputRule(i == fromInteger(valueOf(nbins)) || init_flag);
         let x = inputFIFO.first();
@@ -80,13 +85,27 @@ module mkPitchAdjust(Integer s, FixedPoint#(isize, fsize) factor, PitchAdjust#(n
         outputFIFO.enq(outputData);
     endrule
 
-    interface Put request;
-        method Action put(Vector#(nbins, ComplexMP#(isize, fsize, psize)) x);
-            inputFIFO.enq(x);
-        endmethod
+    // interface Put request;
+    //     method Action put(Vector#(nbins, ComplexMP#(isize, fsize, psize)) x);
+    //         inputFIFO.enq(x);
+    //     endmethod
+    // endinterface
+
+    // interface Get response = toGet(outputFIFO);
+
+    interface PitchAdjust adjust;
+        interface Put request;
+            method Action put(Vector#(nbins, ComplexMP#(isize, fsize, psize)) x);
+                inputFIFO.enq(x);
+            endmethod
+        endinterface
+        interface Get response = toGet(outputFIFO);
     endinterface
 
-    interface Get response = toGet(outputFIFO);
-
+    interface Put setFactor;
+        method Action put(FixedPoint#(isize, fsize) x);
+            factor <= x;
+        endmethod
+    endinterface
 endmodule
 

@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <sys/stat.h>
 #include <pthread.h>
+#include <stdlib.h>
+#include <math.h>
 
 #include "MyDutRequest.h"
 #include "MyDutIndication.h"
@@ -107,6 +109,11 @@ void run_test_bench(){
 
 int main (int argc, const char **argv)
 {
+    double pitchFactor = std::atof(argv[1]);
+    uint16_t m_i = (uint16_t)floor(pitchFactor);
+    uint16_t m_f = (uint16_t)(pow(2, 16) * (pitchFactor - floor(pitchFactor)));
+    uint32_t factorPkt = (uint32_t)((m_i << 16) | m_f);
+
     // Service Indication messages from HW - Register the call-back functions to a indication thread
     MyDutIndication myIndication (IfcNames_MyDutIndicationH2S);
 
@@ -115,7 +122,7 @@ int main (int argc, const char **argv)
 
     // Invoke reset_dut method of HW request ifc (Soft-reset)
     device->reset_dut();
-
+    device->setFactor(factorPkt);
     // Run the testbench: send in.cpm
     run_test_bench();
 }

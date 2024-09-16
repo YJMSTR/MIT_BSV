@@ -6,7 +6,6 @@ import AudioProcessorTypes::*;
 // import FilterCoefficients::*;
 import Multiplier::*;
 
-(* synthesize *)
 module mkFIRFilter (Vector#(tnp1, FixedPoint#(16,16)) coeffs, AudioProcessor ifc);
     FIFO#(Sample) infifo <- mkFIFO();
     FIFO#(Sample) outfifo <- mkFIFO();

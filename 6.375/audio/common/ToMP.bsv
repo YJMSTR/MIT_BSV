@@ -14,7 +14,7 @@ typedef Server#(
     Vector#(nbins, ComplexMP#(isize, fsize, psize))
 ) ToMP#(numeric type nbins, numeric type isize, numeric type fsize, numeric type psize);
 
-(* synthesize *)
+
 module mkToMP(ToMP#(nbins, isize, fsize, psize) ifc)
     provisos(
         Add#(a__, 1, isize),

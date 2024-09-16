@@ -22,7 +22,7 @@ module mkAudioPipeline(AudioProcessor);
     FFT#(FFT_POINTS, FixedPoint#(16, 16)) ifft <- mkIFFT();
     Splitter#(FFT_POINTS, ComplexSample) splitter <- mkSplitter();
     ToMP#(8, 16, 16, 16) toMP <- mkToMP();
-    PitchAdjust#(8, 16, 16, 16) pitchAdjust <- mkPitchAdjust(2, 2);
+    SettablePitchAdjust#(8, 16, 16, 16) pitchAdjust <- mkPitchAdjust(2);
     FromMP#(8, 16, 16, 16) fromMP <- mkFromMP();
 
     rule fir_to_chunker (True);
@@ -42,11 +42,11 @@ module mkAudioPipeline(AudioProcessor);
 
     rule toMP_to_pitchAdjust (True);
         let x <- toMP.response.get();
-        pitchAdjust.request.put(x);
+        pitchAdjust.adjust.request.put(x);
     endrule
 
     rule pitchAdjust_to_fromMP (True);
-        let x <- pitchAdjust.response.get();
+        let x <- pitchAdjust.adjust.response.get();
         fromMP.request.put(x);
     endrule
     
@@ -69,6 +69,12 @@ module mkAudioPipeline(AudioProcessor);
         let x <- splitter.response.get();
         return frcmplx(x);
     endmethod
+
+    interface Put setFactor;
+        method Action put(FixedPoint#(16, 16) x);
+            pitchAdjust.setFactor.put(x);
+        endmethod
+    endinterface
 
 endmodule
 

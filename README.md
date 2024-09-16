@@ -57,4 +57,13 @@ p1 make simulation 的结果和期望结果在 char 15 line 1 不同，和 lab3 
 
 用到 FPGA 的实验部分暂时跳过，但还是扫一眼讲义中的内容。`(* synthesize*)` 可以让编译器不内联某个模块，而是为该模块生成单独的文件和模块。
 
-多态模块前面不能直接加 `(* synthesize *)`，这是由于 Verilog 不支持多态。因此我们需要在多态模块所使用到的各个非多态模块前面加 `(* synthesize *)`。
+多态模块前面不能直接加 `(* synthesize *)`，这是由于 Verilog 不支持多态。因此我们需要在多态模块所使用到的各个非多态模块前面加 `(* synthesize *)`。需要注意的是，如果一个模块加了 provisos 就不能 synthesize 了。
+
+connectal 仅支持 Bit#(n) 类型的信号，因此需要把 FixedPoint#(16, 16) 转换成 Bit#(32) 才能在 connectal 中使用。调用硬件中的方法时可以把 Bit#(32) 通过 unpack 转换为 FixedPoint#(16, 16)，硬件返回的 FixedPoint#(16, 16) 结果可以通过 pack 转换为 Bit#(32)。
+
+unpack 的作用是将 Bit 表示转换为其它 Bluespec 中的类型。
+
+做完 p7 跑 make run_simulation 会报错，改用直接执行 ubuntu.exe 的方式可以运行并跑出 out.pcm，但仿真结束时会出现 `[sock_fd_write:184] error in sendmsg -1 104
+xsim_disconnect:75 pint=0x7761f8001000 calling $finish
+Aborted (core dumped)`
+
