@@ -19,6 +19,7 @@ typedef Server#(
 //
 // factor - the amount to adjust the pitch.
 //  1.0 makes no change. 2.0 goes up an octave, 0.5 goes down an octave, etc...
+(* synthesize *)
 module mkPitchAdjust(Integer s, FixedPoint#(isize, fsize) factor, PitchAdjust#(nbins, isize, fsize, psize) ifc) provisos(RealLiteral#(FixedPoint#(isize, fsize)), Add#(psize, a__, isize), Min#(TAdd#(isize, fsize), 2, 2), Add#(b__, psize, TAdd#(isize, isize)));
     FIFO#(Vector#(nbins, ComplexMP#(isize, fsize, psize))) inputFIFO <- mkFIFO();
     FIFO#(Vector#(nbins, ComplexMP#(isize, fsize, psize))) outputFIFO <- mkFIFO();

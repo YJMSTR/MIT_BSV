@@ -54,3 +54,7 @@ Error: dlopen: ./out.so: undefined symbol: _Z12dollar_fopenPKcPKSsS2_
 用 Docker 做。如果直接用非 root 账户 make simulation，可能会遇到权限不足的问题。这种情况下可以在启动容器时指定 `-root` 选项切换到 root 账户做。
 
 p1 make simulation 的结果和期望结果在 char 15 line 1 不同，和 lab3 的结果在 char 787 line 1 处不同。
+
+用到 FPGA 的实验部分暂时跳过，但还是扫一眼讲义中的内容。`(* synthesize*)` 可以让编译器不内联某个模块，而是为该模块生成单独的文件和模块。
+
+多态模块前面不能直接加 `(* synthesize *)`，这是由于 Verilog 不支持多态。因此我们需要在多态模块所使用到的各个非多态模块前面加 `(* synthesize *)`。

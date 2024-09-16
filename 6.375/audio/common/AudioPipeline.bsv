@@ -13,7 +13,7 @@ import ToMP::*;
 import FromMP::*;
 import PitchAdjust::*;
 
-
+(* synthesize *)
 module mkAudioPipeline(AudioProcessor);
 
     AudioProcessor fir <- mkFIRFilter(c);

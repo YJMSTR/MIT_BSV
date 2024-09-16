@@ -14,6 +14,7 @@ typedef Server#(
     Vector#(nbins, Complex#(FixedPoint#(isize, fsize)))
 ) FromMP#(numeric type nbins, numeric type isize, numeric type fsize, numeric type psize);
 
+(* synthesize *)
 module mkFromMP(FromMP#(nbins, isize, fsize, psize) ifc)
     provisos(
         Add#(a__, 1, isize),
