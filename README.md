@@ -44,3 +44,13 @@ Error: dlopen: ./out.so: undefined symbol: _Z12dollar_fopenPKcPKSsS2_
 实现流水线中的 ToMP 和 FromMP 模块，用 Cordic 算法转换直角坐标和极坐标。Cordic 的代码已经给我们了，直接调用就行。
 
 写完以后往流水线里加三个模块。
+
+最终结果和期望结果在 char 15 line 1 不同。上 Github 扒了个其他人写好的代码跑了一下，也是这样。暂时认为实现是正确的。
+
+### lab4
+
+#### connectal
+
+用 Docker 做。如果直接用非 root 账户 make simulation，可能会遇到权限不足的问题。这种情况下可以在启动容器时指定 `-root` 选项切换到 root 账户做。
+
+p1 make simulation 的结果和期望结果在 char 15 line 1 不同，和 lab3 的结果在 char 787 line 1 处不同。
