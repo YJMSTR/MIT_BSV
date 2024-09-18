@@ -14,6 +14,22 @@ ArchLinux 上通过 `yay -S bluespec-git` 构建 bsc 时 GHC 会报错，考虑�
 
 ## 6.175
 
+### lab5
+
+和 ysyx 差不多，从单周期开始，写到多周期，再到两级流水，再到两级 BTB. 
+
+2016 版的 lab5 用 Scemi 仿真，2017 版用 connectal。这里我们做 2017 版的 lab5。
+
+执行 `bash init.sh` 时可能会报错 “RPC failed; curl 92 HTTP/2 stream 0 was not closed cleanly: CANCEL (err 8)”，开全局代理 + 执行下述命令后暂时解决：`git config --global http.postBuffer 524288000`。
+
+随后脚本会使用 curl 下载 ply-3.9.tar.gz，但脚本中的链接已经失效，我们可以手动从 `https://github.com/dabeaz/archive/blob/main/ply/ply-3.9.tar.gz` 下载。此外，脚本会将 connectal 中的 `python script` 全部替换为 `python2.7 script`，但最新拉下来的 connectal 文件夹里的 Makefile 用得其实是 python3 script。这里要么把 ply 和 py 都改用最新版（没试过），要么全部对齐到实验当年的版本。我的选择是把 python3 改回 python2.7
+
+由于 bsc 版本问题，实验代码的一些部分需要修改以后才能跑通，例如 tagged Valid 要改为 tagged Valid False，并修改相应寄存器的类型从 Maybe#(void) 改为 Maybe#(Bool)。
+
+lab5 初始代码缺少 simple.S，并且 Makefile 中的工具链路径需要手动修改一下。此处通过 apt 安装交叉编译工具链，并把 Makefile 中的路径改成 /usr/bin/ 下的路径。
+
+配置好交叉编译工具链后，make 会报错缺少 mtohost 这个 CSR，待解决
+
 ## 6.375
 
 ### lab2
