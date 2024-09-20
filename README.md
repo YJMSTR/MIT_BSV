@@ -26,9 +26,13 @@ ArchLinux 上通过 `yay -S bluespec-git` 构建 bsc 时 GHC 会报错，考虑�
 
 由于 bsc 版本问题，实验代码的一些部分需要修改以后才能跑通，例如 tagged Valid 要改为 tagged Valid False，并修改相应寄存器的类型从 Maybe#(void) 改为 Maybe#(Bool)。
 
-lab5 初始代码缺少 simple.S，并且 Makefile 中的工具链路径需要手动修改一下。此处通过 apt 安装交叉编译工具链，并把 Makefile 中的路径改成 /usr/bin/ 下的路径。
+lab5 初始代码缺少 simple.S，并且 Makefile 中的工具链路径需要手动修改一下。此处通过 apt 安装交叉编译工具链，并把 Makefile 中的路径改成 /usr/bin/ 下的路径，上网扒了个 Simple.S 过来。
 
-配置好交叉编译工具链后，make 会报错缺少 mtohost 这个 CSR，待解决
+实验自带的 Makefile 中传递了 -m32 参数给交叉编译工具链，但现在 GCC 和 RISC-V Spec 的版本均已更新，I 扩展中也不再包含 Zicsr 指令，需要写 `-march=rv32i_zicsr` 代替，并去掉 -m32，此外若编译工具链时使用的 abi 不是 ilp32, 则需要加上 `-mabi=ilp32` 选项。
+
+配置好交叉编译工具链后，make 会报错缺少 mtohost 这个 CSR，mtohost 并不属于 RISC-V 标准（曾经是非标准 HTIF 的一部分，现在已经被移除了），主要是用于测试。我们需要把 mtohost 换成别的 CSR。后续要读出时，也要把 mfromhost 换成对应的 CSR。
+
+自行编译的工具链不带有 elf2hex 工具，可以 git clone git://github.com/sifive/elf2hex.git 下载。
 
 ## 6.375
 
