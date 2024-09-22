@@ -74,7 +74,8 @@ $(rv32ui_tests_bin): %.riscv: %.S
 $(rv32ui_tests_vmh): %.riscv.vmh: %.riscv
 	@echo $(basename $<)
 	@echo "@0" > $(asm_build_vmh_dir)/temp
-	$(RISCV_ELF2HEX) $(VMH_WIDTH) $(VMH_DEPTH) $(asm_build_bin_dir)/$< >> $(asm_build_vmh_dir)/temp
+# $(RISCV_ELF2HEX) $(VMH_WIDTH) $(VMH_DEPTH) $(asm_build_bin_dir)/$< >> $(asm_build_vmh_dir)/temp
+	$(RISCV_ELF2HEX) --bit-width  $(VMH_WIDTH) --input $< >> $(asm_build_vmh_dir)/temp
 	python $(asmdir)/../trans_vmh.py $(asm_build_vmh_dir)/temp $(asm_build_vmh_dir)/$@
 
 $(rv32ui_tests_dump): %.riscv.dump: %.riscv

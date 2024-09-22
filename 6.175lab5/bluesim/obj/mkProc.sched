@@ -1,0 +1,127 @@
+=== Generated schedule for mkProc ===
+
+Method schedule
+---------------
+Method: cpuToHost
+Ready signal: csrf.RDY_cpuToHost
+Conflict-free: hostToCpu,
+	       iMemInit_request_put,
+	       iMemInit_done,
+	       dMemInit_request_put,
+	       dMemInit_done
+Conflicts: cpuToHost
+ 
+Method: hostToCpu
+Ready signal: (! csrf.started) && iMem.init_done && dMem.init_done &&
+	      csrf.RDY_start
+Conflict-free: cpuToHost, iMemInit_done, dMemInit_done
+Sequenced before: iMemInit_request_put, dMemInit_request_put
+Sequenced before (restricted): hostToCpu
+ 
+Method: iMemInit_request_put
+Ready signal: iMem.RDY_init_request_put
+Conflict-free: cpuToHost, dMemInit_request_put, dMemInit_done
+Sequenced after: hostToCpu, iMemInit_done
+Conflicts: iMemInit_request_put
+ 
+Method: iMemInit_done
+Ready signal: True
+Conflict-free: cpuToHost,
+	       hostToCpu,
+	       iMemInit_done,
+	       dMemInit_request_put,
+	       dMemInit_done
+Sequenced before: iMemInit_request_put
+ 
+Method: dMemInit_request_put
+Ready signal: dMem.RDY_init_request_put
+Conflict-free: cpuToHost, iMemInit_request_put, iMemInit_done
+Sequenced after: hostToCpu, dMemInit_done
+Conflicts: dMemInit_request_put
+ 
+Method: dMemInit_done
+Ready signal: True
+Conflict-free: cpuToHost,
+	       hostToCpu,
+	       iMemInit_request_put,
+	       iMemInit_done,
+	       dMemInit_done
+Sequenced before: dMemInit_request_put
+ 
+Rule schedule
+-------------
+Rule: test
+Predicate: iMem.RDY_init_request_put && dMem.RDY_init_request_put &&
+	   ((! iMem.init_done) || (! dMem.init_done))
+Blocking rules: dMemInit_request_put, iMemInit_request_put
+ 
+Rule: doProc
+Predicate: csrf.RDY_wr &&
+	   iMem.RDY_req &&
+	   ((Exec.exec(Decode.decode(iMem.req(pc)),
+		       rf.rd1(Decode.decode(iMem.req(pc))[57]
+			      ? Decode.decode(iMem.req(pc))[56:52]
+			      : (_ :: Bit 5)),
+		       rf.rd2(Decode.decode(iMem.req(pc))[51]
+			      ? Decode.decode(iMem.req(pc))[50:46]
+			      : (_ :: Bit 5)),
+		       pc,
+		       (_ :: Bit 32),
+		       csrf.rd(Decode.decode(iMem.req(pc))[45]
+			       ? Decode.decode(iMem.req(pc))[44:33]
+			       : (_ :: Bit 12)))[88:85] ==
+	     4'd2)
+	    ? dMem.RDY_req
+	    : ((! (Exec.exec(Decode.decode(iMem.req(pc)),
+			     rf.rd1(Decode.decode(iMem.req(pc))[57]
+				    ? Decode.decode(iMem.req(pc))[56:52]
+				    : (_ :: Bit 5)),
+			     rf.rd2(Decode.decode(iMem.req(pc))[51]
+				    ? Decode.decode(iMem.req(pc))[50:46]
+				    : (_ :: Bit 5)),
+			     pc,
+			     (_ :: Bit 32),
+			     csrf.rd(Decode.decode(iMem.req(pc))[45]
+				     ? Decode.decode(iMem.req(pc))[44:33]
+				     : (_ :: Bit 12)))[88:85] ==
+		   4'd3)) ||
+	       dMem.RDY_req)) &&
+	   ((! Exec.exec(Decode.decode(iMem.req(pc)),
+			 rf.rd1(Decode.decode(iMem.req(pc))[57]
+				? Decode.decode(iMem.req(pc))[56:52]
+				: (_ :: Bit 5)),
+			 rf.rd2(Decode.decode(iMem.req(pc))[51]
+				? Decode.decode(iMem.req(pc))[50:46]
+				: (_ :: Bit 5)),
+			 pc,
+			 (_ :: Bit 32),
+			 csrf.rd(Decode.decode(iMem.req(pc))[45]
+				 ? Decode.decode(iMem.req(pc))[44:33]
+				 : (_ :: Bit 12)))[84]) ||
+	    (! (Exec.exec(Decode.decode(iMem.req(pc)),
+			  rf.rd1(Decode.decode(iMem.req(pc))[57]
+				 ? Decode.decode(iMem.req(pc))[56:52]
+				 : (_ :: Bit 5)),
+			  rf.rd2(Decode.decode(iMem.req(pc))[51]
+				 ? Decode.decode(iMem.req(pc))[50:46]
+				 : (_ :: Bit 5)),
+			  pc,
+			  (_ :: Bit 32),
+			  csrf.rd(Decode.decode(iMem.req(pc))[45]
+				  ? Decode.decode(iMem.req(pc))[44:33]
+				  : (_ :: Bit 12)))[88:85] ==
+		4'd2)) ||
+	    dMem.RDY_req) &&
+	   csrf.started
+Blocking rules: (none)
+ 
+Logical execution order: cpuToHost,
+			 hostToCpu,
+			 iMemInit_done,
+			 iMemInit_request_put,
+			 dMemInit_done,
+			 dMemInit_request_put,
+			 test,
+			 doProc
+
+======================================

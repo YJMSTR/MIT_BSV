@@ -39,11 +39,11 @@ bmarks_host = \
 HOST_OPTS = -std=gnu99 -DPREALLOCATE=0 -DHOST_DEBUG=1 -I$(bmarkdir)/common
 HOST_COMP = gcc $(HOST_OPTS)
 
-RISCV_TOOL_DIR = /mit/6.175/rv32-gcc/bin
+RISCV_TOOL_DIR = /opt/riscv/bin
 RISCV_PREFIX = $(RISCV_TOOL_DIR)/riscv32-unknown-elf
 # gcc
 RISCV_GCC = $(RISCV_PREFIX)-gcc
-RISCV_GCC_OPTS = -static -Wa,-march=RVI -std=gnu99 -O2 -ffast-math -fno-common -fno-builtin-printf
+RISCV_GCC_OPTS = -static -Wa,-march=rv32i_zicsr -mabi=ilp32 -std=gnu99 -O2 -ffast-math -fno-common -fno-builtin-printf
 # link
 RISCV_LINK = $(RISCV_GCC) -T$(bmarkdir)/common/test.ld $(incs) -I$(bmarks_build_obj_dir)/
 RISCV_LINK_OPTS = -nostdlib -nostartfiles -ffast-math -lc -lgcc
@@ -78,7 +78,7 @@ bmarks_cycles = 80000
 $(bmarks_riscv_vmh): %.riscv.vmh: %.riscv
 	@echo $(basename $<)
 	@echo "@0" > $(bmarks_build_vmh_dir)/temp
-	$(RISCV_ELF2HEX) $(VMH_WIDTH) $(VMH_DEPTH) $(bmarks_build_bin_dir)/$< >> $(bmarks_build_vmh_dir)/temp
+	$(RISCV_ELF2HEX) --bit-width $(VMH_WIDTH) --input $(bmarks_build_bin_dir)/$< >> $(bmarks_build_vmh_dir)/temp
 	python $(bmarkdir)/../trans_vmh.py $(bmarks_build_vmh_dir)/temp $(bmarks_build_vmh_dir)/$@
 
 $(bmarks_riscv_dump): %.riscv.dump: %.riscv

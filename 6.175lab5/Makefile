@@ -1,4 +1,4 @@
-CONNECTALDIR ?= /opt/connectal
+CONNECTALDIR ?= ./connectal
 S2H_INTERFACES = \
 	ConnectalProcRequest:ConnectalWrapper.connectProc
 H2S_INTERFACES = \

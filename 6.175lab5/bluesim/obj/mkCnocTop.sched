@@ -1,0 +1,408 @@
+=== Generated schedule for mkCnocTop ===
+
+Method schedule
+---------------
+Method: requests_0_id
+Ready signal: True
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: requests_0_message_enq
+Ready signal: lConnectalProcRequestInputNoc_fifoMsgSink.i_notFull
+Conflict-free: requests_0_id,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+Sequenced after: requests_0_message_notFull
+Conflicts: requests_0_message_enq
+ 
+Method: requests_0_message_notFull
+Ready signal: True
+Conflict-free: requests_0_id,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+Sequenced before: requests_0_message_enq
+ 
+Method: indications_0_id
+Ready signal: True
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: indications_0_message_first
+Ready signal: lConnectalProcIndicationOutputNoc_fifoMsgSource.i_notEmpty
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+Sequenced before: indications_0_message_deq
+ 
+Method: indications_0_message_deq
+Ready signal: lConnectalProcIndicationOutputNoc_fifoMsgSource.i_notEmpty
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+Sequenced after: indications_0_message_first, indications_0_message_notEmpty
+Conflicts: indications_0_message_deq
+ 
+Method: indications_0_message_notEmpty
+Ready signal: True
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+Sequenced before: indications_0_message_deq
+ 
+Method: readers_0_readReq_get
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: readers_0_readData_put
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: readers_1_readReq_get
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: readers_1_readData_put
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: writers_0_writeReq_get
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: writers_0_writeData_get
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: writers_0_writeDone_put
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: writers_1_writeReq_get
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: writers_1_writeData_get
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Method: writers_1_writeDone_put
+Ready signal: False
+Conflict-free: requests_0_id,
+	       requests_0_message_enq,
+	       requests_0_message_notFull,
+	       indications_0_id,
+	       indications_0_message_first,
+	       indications_0_message_deq,
+	       indications_0_message_notEmpty,
+	       readers_0_readReq_get,
+	       readers_0_readData_put,
+	       readers_1_readReq_get,
+	       readers_1_readData_put,
+	       writers_0_writeReq_get,
+	       writers_0_writeData_get,
+	       writers_0_writeDone_put,
+	       writers_1_writeReq_get,
+	       writers_1_writeData_get,
+	       writers_1_writeDone_put
+ 
+Rule schedule
+-------------
+Rule: lConnectalWrapper_relayMessage
+Predicate: lConnectalProcIndicationOutput.RDY_ifc_sendMessage &&
+	   lConnectalWrapper_m.RDY_cpuToHost
+Blocking rules: (none)
+ 
+Rule: handle_hostToCpu_request
+Predicate: lConnectalWrapper_m.RDY_hostToCpu &&
+	   lConnectalProcRequestInput.RDY_pipes_hostToCpu_PipeOut_first &&
+	   lConnectalProcRequestInput.RDY_pipes_hostToCpu_PipeOut_deq
+Blocking rules: (none)
+ 
+Rule: lConnectalProcIndicationOutputNoc_sendHeader
+Predicate: lConnectalProcIndicationOutputNoc_fifoMsgSource.i_notFull &&
+	   (! lConnectalProcIndicationOutputNoc_bpState) &&
+	   lConnectalProcIndicationOutput.portalIfc_indications_0_notEmpty
+Blocking rules: (none)
+ 
+Rule: lConnectalProcIndicationOutputNoc_sendMessage
+Predicate: lConnectalProcIndicationOutputNoc_fifoMsgSource.i_notFull &&
+	   ((! (lConnectalProcIndicationOutputNoc_methodIdReg == 8'd0)) ||
+	    lConnectalProcIndicationOutput.RDY_portalIfc_indications_0_deq) &&
+	   ((! (lConnectalProcIndicationOutputNoc_methodIdReg == 8'd0)) ||
+	    lConnectalProcIndicationOutput.RDY_portalIfc_indications_0_first) &&
+	   lConnectalProcIndicationOutputNoc_bpState
+Blocking rules: (none)
+ 
+Rule: lConnectalProcRequestInputNoc_receiveMessageHeader
+Predicate: lConnectalProcRequestInputNoc_fifoMsgSink.i_notEmpty &&
+	   (! lConnectalProcRequestInputNoc_bpState)
+Blocking rules: (none)
+ 
+Rule: lConnectalProcRequestInputNoc_receiveMessage
+Predicate: lConnectalProcRequestInputNoc_fifoMsgSink.i_notEmpty &&
+	   ((! (lConnectalProcRequestInputNoc_methodIdReg == 8'd0)) ||
+	    lConnectalProcRequestInput.RDY_portalIfc_requests_0_enq) &&
+	   lConnectalProcRequestInputNoc_bpState
+Blocking rules: (none)
+ 
+Logical execution order: requests_0_id,
+			 requests_0_message_notFull,
+			 requests_0_message_enq,
+			 indications_0_id,
+			 indications_0_message_first,
+			 indications_0_message_notEmpty,
+			 indications_0_message_deq,
+			 readers_0_readReq_get,
+			 readers_0_readData_put,
+			 readers_1_readReq_get,
+			 readers_1_readData_put,
+			 writers_0_writeReq_get,
+			 writers_0_writeData_get,
+			 writers_0_writeDone_put,
+			 writers_1_writeReq_get,
+			 writers_1_writeData_get,
+			 writers_1_writeDone_put,
+			 lConnectalProcIndicationOutputNoc_sendHeader,
+			 lConnectalWrapper_relayMessage,
+			 lConnectalProcIndicationOutputNoc_sendMessage,
+			 lConnectalProcRequestInputNoc_receiveMessageHeader,
+			 lConnectalProcRequestInputNoc_receiveMessage,
+			 handle_hostToCpu_request
+
+=========================================
