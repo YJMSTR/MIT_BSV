@@ -32,7 +32,33 @@ lab5 初始代码缺少 simple.S，并且 Makefile 中的工具链路径需要�
 
 配置好交叉编译工具链后，make 会报错缺少 mtohost 这个 CSR，mtohost 并不属于 RISC-V 标准（曾经是非标准 HTIF 的一部分，现在已经被移除了），主要是用于测试。我们需要把 mtohost 换成别的 CSR。后续要读出时，也要把 mfromhost 换成对应的 CSR。
 
-自行编译的工具链不带有 elf2hex 工具，可以 git clone git://github.com/sifive/elf2hex.git 下载。
+自行编译的工具链不带有 elf2hex 工具，可以 git clone git://github.com/sifive/elf2hex.git 下载。编译之后创建一个软链接到 /opt/riscv/bin/ 下并命名为 elf2hex 即可。需要注意的是要改一下 Makefile 中 elf2hex 的参数的格式。
+
+elf2hex 报错：`elf2hex: could not find objcopy`。可以直接用 vim 修改 elf2hex 脚本，把里面的 objcopy 路径改了。
+此外 make 的执行还需要安装 python. docker 里已经有 python3 了，可以装个 python2 来跑 make。直接用 python-is-python3 的话可能还得修改 python 脚本里的部分语法。
+
+编译 benchmark 时也需要进行上述修改，此外 crt.S 中会用到 eret 这个指令，其对应的具体指令与当前特权级有关。
+
+编译项目时会报错 ply.lex 找不到，经检查发现是 ln -s 无法有效创建指向 ply 文件夹的软链接，直接把 ply 文件夹里的文件复制过来也可以。
+
+编译 benchmark 时会报错 median.riscv: no such file. 这是因为传给 elf2hex 的路径不对。
+
+修复之后 make 会报错 bk_init 函数参数只有两个，但是用的时候传了三个参数。connectal 的源码 `connectal/scripts
+/Makefile.connectal.build` 中对 bsc 的版本进行了判断，在 bsc major 小于等于 2019 时会使用三个参数，否则使用两个参数。看上去这个判断没有正确执行，导致了出错。我们可以手动调整相应位置的代码。
+
+修复之后 make 执行仿真会报错缺了两个库：
+
+```
+/usr/bin/ld: cannot find -lbskernel: No such file or directory
+/usr/bin/ld: cannot find -lbsprim: No such file or directory
+```
+
+这同样是 connectal 对 bsc 的版本判断未生效导致的。我们可以手动修改 Makefile.connectal.build 中的内容，去掉对老旧版本 bsc 的判断。
+
+跑 run_asm.sh 仿真时会报错 `ERROR: ld.so: object 'libSegFault.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.`， `/bin/sh: 1: cannot open /home/ubuntu/MIT_BSV/6.175lab5/connectal/boardinfo/.json: No such file`. https://lemire.me/blog/2023/05/01/under-linux-libsegfault-and-addr2line-are-underrated/ 中提到现在版本 工具链似乎移除了 libsegfault，自从 ubuntu22.04 开始，需要安装 glibc-tools 才能获得这个库。通过 apt 在 docker 中安装后不再报错。
+此外注意到会报 `ERROR: Executing unsupported instruction at pc: 00000200. Exiting`，怀疑是生成的 vmh 有问题
+
+重读了一遍 `https://mp.weixin.qq.com/s?__biz=MzkwNTMzOTE2MA==&mid=2247485751&idx=3&sn=36a5323b3c32984bb94c97b313aa0c23&chksm=c0f80140f78f8856abd37f667cbd06a3267eed4ed34c1d36f16f527d8613ea14d1dbdcad0b8f&scene=21#wechat_redirect`，发现 6.175 的 lab5 要改的地方还蛮多的，run_asm.sh 和 run_bmarks.sh 都要改。
 
 ## 6.375
 
