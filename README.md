@@ -56,7 +56,9 @@ elf2hex 报错：`elf2hex: could not find objcopy`。可以直接用 vim 修改 
 这同样是 connectal 对 bsc 的版本判断未生效导致的。我们可以手动修改 Makefile.connectal.build 中的内容，去掉对老旧版本 bsc 的判断。
 
 跑 run_asm.sh 仿真时会报错 `ERROR: ld.so: object 'libSegFault.so' from LD_PRELOAD cannot be preloaded (cannot open shared object file): ignored.`， `/bin/sh: 1: cannot open /home/ubuntu/MIT_BSV/6.175lab5/connectal/boardinfo/.json: No such file`. https://lemire.me/blog/2023/05/01/under-linux-libsegfault-and-addr2line-are-underrated/ 中提到现在版本 工具链似乎移除了 libsegfault，自从 ubuntu22.04 开始，需要安装 glibc-tools 才能获得这个库。通过 apt 在 docker 中安装后不再报错。
-此外注意到会报 `ERROR: Executing unsupported instruction at pc: 00000200. Exiting`，怀疑是生成的 vmh 有问题
+
+此外注意到会报 `ERROR: Executing unsupported instruction at pc: 00000200. Exiting`，怀疑是生成的 vmh 有问题，查看 vmh 转换脚本，发现每行读八个字符，但是 vmh 文件每行只有两个字符。注意：这个 bug 修复之前运行 run_asm.sh 可能会导致 bne 测例死循环，生成巨大的 log。
+
 
 重读了一遍 `https://mp.weixin.qq.com/s?__biz=MzkwNTMzOTE2MA==&mid=2247485751&idx=3&sn=36a5323b3c32984bb94c97b313aa0c23&chksm=c0f80140f78f8856abd37f667cbd06a3267eed4ed34c1d36f16f527d8613ea14d1dbdcad0b8f&scene=21#wechat_redirect`，发现 6.175 的 lab5 要改的地方还蛮多的，run_asm.sh 和 run_bmarks.sh 都要改。
 
